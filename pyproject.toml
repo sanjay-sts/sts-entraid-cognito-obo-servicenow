@@ -1,0 +1,25 @@
+[project]
+name = "sn-obo-mcp"
+version = "0.1.0"
+description = "Stateless FastMCP server: Cognito token exchange (OBO) to ServiceNow"
+requires-python = ">=3.12"
+dependencies = [
+    "fastmcp==4.1.4",
+    "httpx>=0.27",
+    "boto3>=1.35",
+    "python-dotenv>=1.0",
+    "uvicorn>=0.30",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8",
+    "respx>=0.21",
+    "cryptography>=43",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.uv]
+package = false
