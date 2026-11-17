@@ -137,6 +137,11 @@ Map HTTP 401 → "token rejected", 403 → "ServiceNow ACL denied", 404/empty �
 4. Restart server mid-session → next tool call works without re-login (stateless). ✅
 5. M2M token → user tools refuse; unknown-pool token → 401. ⏳ M2M not run (`mcp-m2m` not created); tampered token → 401 ✅
 
+## Open questions (decide before next phase)
+- **OQ-1: Keep DCR, or use pre-registered public clients?** PKCE does not need DCR — a pre-registered public Cognito client works (proven: `gate1-test` + `~/obo-test.sh`). DCR only saves entering a client ID in the MCP client, but creates one Cognito client per connection (7 `dcr-MCP Inspector` clients in one test afternoon, deleted 2026-11-16), needs IAM `CreateUserPoolClient` on the server, hits the app-client quota, and lets anyone reaching `/register` create clients. Proposal (not implemented): `DCR_ENABLED` setting, default `false` (omit `registration_endpoint`, `/register` → 404); pre-register `mcp-inspector` (callbacks `http://localhost:6274/oauth/callback`, `http://127.0.0.1:6274/oauth/callback`) and `mcp-claude-code` (fixed `--callback-port`, e.g. `http://localhost:33418/callback`); use `claude mcp add --client-id … --callback-port …`. `/authorize` + `/token` pass-throughs stay either way (Cognito `resource` / `invalid_target`). Quick check without code: Inspector opened at `http://localhost:6274` with Client ID = `gate1-test`.
+  - **Field evidence (user's work environment):** Claude Code did PKCE against a pre-registered public client, no DCR. That MCP server is **private behind ALB + ECS**; DCR was deliberately avoided because claude.ai web connectors cannot reach a private endpoint anyway, and an open `/register` would let anyone on the network mint Cognito clients. Loopback callbacks still work because the redirect lands on the user's own machine (`http://localhost:<port>/callback`); only `BASE_URL` changes to the internal ALB HTTPS host.
+  - **Leaning:** DCR off by default for the private ALB/ECS target; keep it as an opt-in for local lab use.
+
 ## Constraints / preferences
 - Pin `fastmcp==4.1.4`. Python 3.12+, `uv`. Secrets from env (`~/sn-obo.env`), never in code or git.
 - Prefer empirical validation: write small tests/scripts before large code.

@@ -148,4 +148,8 @@ Next diagnostic steps:
 
 - M2M setup (see [runbook](runbook.md)) and M2M tests.
 - Claude Code client test.
-- Clean up stale `dcr-*` Cognito clients (several Inspector clients were created during testing).
+- ~~Clean up stale `dcr-*` Cognito clients~~ — done 2026-11-16: 7 `dcr-MCP Inspector` clients deleted; pool now has only `gate1-test` and `mcp-obo`.
+
+## Open questions
+
+- **OQ-1: DCR vs pre-registered public clients.** PKCE does not require DCR (pre-registered `gate1-test` works). The 7 clients created in one afternoon show the DCR sprawl cost. Decision pending; see CLAUDE.md "Open questions".

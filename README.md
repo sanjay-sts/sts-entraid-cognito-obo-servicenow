@@ -147,6 +147,10 @@ Details and evidence in [docs/acceptance-2026-11-16.md](docs/acceptance-2026-11-
 - Not yet run: Claude Code client, M2M tokens (`mcp-m2m` resource server not created), M2M -> ServiceNow.
 - Stale `dcr-*` Cognito clients accumulate; no automatic cleanup.
 
+## Open questions
+
+- **OQ-1: DCR or pre-registered clients?** PKCE works without DCR using a pre-registered public Cognito client. DCR avoids configuring a client ID but creates a Cognito client per connection, needs `cognito-idp:CreateUserPoolClient` on the server, and is open to anyone who can reach `/register`. Proposed (not implemented): `DCR_ENABLED=false` by default plus pre-registered `mcp-inspector` and `mcp-claude-code` clients. Pre-registered PKCE from Claude Code has already been used against a private ALB + ECS MCP deployment, where DCR is unwanted (claude.ai cannot reach it, and an open `/register` is a risk). Details in [CLAUDE.md](CLAUDE.md#open-questions-decide-before-next-phase).
+
 ## Security notes
 
 - Secrets only in `~/sn-obo.env` or the environment; never in code or git. Tokens are never logged (only user name and a short hash prefix).
